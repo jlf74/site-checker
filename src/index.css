@@ -14,3 +14,46 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.markdown-result {
+  font-size: 15px;
+  line-height: 1.7;
+  color: #c8c8c0;
+}
+
+.markdown-result p {
+  margin-bottom: 12px;
+}
+
+.markdown-result ul,
+.markdown-result ol {
+  padding-left: 20px;
+  margin-bottom: 12px;
+}
+
+.markdown-result li {
+  margin-bottom: 6px;
+}
+
+.markdown-result strong {
+  color: #e2e8f0;
+  font-weight: 600;
+}
+
+.markdown-result h1,
+.markdown-result h2,
+.markdown-result h3 {
+  font-family: 'Manrope', sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  color: #a78bfa;
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+.markdown-result code {
+  background: #1a1a2e;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 13px;
+}

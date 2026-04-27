@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import ReactMarkdown from "react-markdown";
 
 const CHECKS = [
   {
@@ -522,7 +523,7 @@ export default function SiteChecker() {
                   background: "#0d0d14",
                   border: `1px solid ${CHECKS.find(c => c.id === activeResult)?.color}22`,
                   borderRadius: 12,
-                  padding: "28px",
+                  padding: "32px",
                 }}>
                   <div style={{
                     display: "flex",
@@ -541,17 +542,9 @@ export default function SiteChecker() {
                       {CHECKS.find(c => c.id === activeResult)?.label}
                     </span>
                   </div>
-                  <pre style={{
-                    fontSize: 13,
-                    lineHeight: 1.8,
-                    color: "#c8c8c0",
-                    whiteSpace: "pre-wrap",
-                    wordBreak: "break-word",
-                    margin: 0,
-                    fontFamily: "inherit",
-                  }}>
-                    {results[activeResult]}
-                  </pre>
+                  <div className="markdown-result">
+                    <ReactMarkdown>{results[activeResult]}</ReactMarkdown>
+                  </div>
                 </div>
               )}
 

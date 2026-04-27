@@ -146,7 +146,7 @@ async function fetchSiteContent(url) {
 
 async function runCheck(checkId, siteText) {
   const check = CHECKS.find((c) => c.id === checkId);
-  const response = await fetch("https://api.anthropic.com/v1/messages", {
+  const response = await fetch("/api/claude", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({

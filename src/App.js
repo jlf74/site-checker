@@ -110,38 +110,11 @@ function extractText(html) {
 }
 
 async function fetchSiteContent(url) {
-  const proxies = [
-    async () => {
-      const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}&timestamp=${Date.now()}`);
-      if (!res.ok) throw new Error("allorigins failed");
-      const data = await res.json();
-      if (!data.contents) throw new Error("empty allorigins");
-      return extractText(data.contents);
-    },
-    async () => {
-      const res = await fetch(`https://corsproxy.io/?${encodeURIComponent(url)}`);
-      if (!res.ok) throw new Error("corsproxy failed");
-      const html = await res.text();
-      return extractText(html);
-    },
-    async () => {
-      const res = await fetch(`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`);
-      if (!res.ok) throw new Error("codetabs failed");
-      const html = await res.text();
-      return extractText(html);
-    },
-  ];
-
-  let lastError;
-  for (const proxy of proxies) {
-    try {
-      const text = await proxy();
-      if (text && text.length > 100) return text;
-    } catch (e) {
-      lastError = e;
-    }
-  }
-  throw lastError || new Error("Все прокси недоступны");
+  const res = await fetch(`/api/proxy?url=${encodeURIComponent(url)}`);
+  if (!res.ok) throw new Error("proxy failed");
+  const data = await res.json();
+  if (!data.content) throw new Error("empty response");
+  return extractText(data.content);
 }
 
 async function runCheck(checkId, siteText) {

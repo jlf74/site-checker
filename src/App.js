@@ -123,7 +123,7 @@ async function runCheck(checkId, siteText) {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      model: "claude-sonnet-4-20250514",
+      model: "claude-sonnet-4-6",
       max_tokens: 1000,
       system: check.prompt,
       messages: [
@@ -135,6 +135,9 @@ async function runCheck(checkId, siteText) {
     }),
   });
   const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.error?.message || data.error || `API error ${response.status}`);
+  }
   return data.content?.[0]?.text || "Не удалось получить результат";
 }
 

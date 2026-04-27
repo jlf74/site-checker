@@ -138,7 +138,7 @@ async function runCheck(checkId, siteText) {
   if (!response.ok) {
     throw new Error(data.error?.message || data.error || `API error ${response.status}`);
   }
-  return data.content?.[0]?.text || "Не удалось получить результат";
+  return data.choices?.[0]?.message?.content || "Не удалось получить результат";
 }
 
 export default function SiteChecker() {

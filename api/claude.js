@@ -6,9 +6,9 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).end();
 
-  if (!process.env.ANTHROPIC_API_KEY) {
-    console.error('[claude] ANTHROPIC_API_KEY is not set');
-    return res.status(500).json({ error: 'ANTHROPIC_API_KEY is not configured' });
+  if (!process.env.DEEPSEEK_API_KEY) {
+    console.error('[claude] DEEPSEEK_API_KEY is not set');
+    return res.status(500).json({ error: 'DEEPSEEK_API_KEY is not configured' });
   }
 
   // Парсим body вручную если он ещё не был распарсен (строка вместо объекта)
@@ -22,24 +22,32 @@ export default async function handler(req, res) {
     }
   }
 
-  console.log('[claude] Request model:', body?.model, '| messages count:', body?.messages?.length);
+  // Собираем messages: system-промпт передаём как первое сообщение role: "system"
+  const messages = body.system
+    ? [{ role: 'system', content: body.system }, ...body.messages]
+    : body.messages;
+
+  console.log('[claude] Request | messages count:', messages?.length);
 
   try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': process.env.ANTHROPIC_API_KEY,
-        'anthropic-version': '2023-06-01',
+        'Authorization': `Bearer ${process.env.DEEPSEEK_API_KEY}`,
       },
-      body: JSON.stringify(body),
+      body: JSON.stringify({
+        model: 'deepseek-chat',
+        max_tokens: body.max_tokens,
+        messages,
+      }),
     });
 
     const data = await response.json();
-    console.log('[claude] Anthropic status:', response.status, '| stop_reason:', data.stop_reason, '| error:', data.error ?? null);
+    console.log('[claude] Deepseek status:', response.status, '| finish_reason:', data.choices?.[0]?.finish_reason, '| error:', data.error ?? null);
 
     if (!response.ok) {
-      console.error('[claude] Anthropic error response:', JSON.stringify(data));
+      console.error('[claude] Deepseek error response:', JSON.stringify(data));
       return res.status(response.status).json(data);
     }
 

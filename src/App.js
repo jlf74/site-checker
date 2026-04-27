@@ -226,7 +226,7 @@ export default function SiteChecker() {
     <div style={{
       minHeight: "100vh",
       background: "#0a0a0f",
-      fontFamily: "'DM Mono', 'Courier New', monospace",
+      fontFamily: "'Inter', sans-serif",
       color: "#e8e8e0",
       padding: "0",
     }}>

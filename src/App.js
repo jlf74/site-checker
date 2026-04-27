@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 
 const CHECKS = [
   {
@@ -111,7 +111,12 @@ function extractText(html) {
 
 async function fetchSiteContent(url) {
   const res = await fetch(`/api/proxy?url=${encodeURIComponent(url)}`);
-  if (!res.ok) throw new Error("proxy failed");
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    const err = new Error(data.error || "proxy failed");
+    err.status = res.status;
+    throw err;
+  }
   const data = await res.json();
   if (!data.content) throw new Error("empty response");
   return extractText(data.content);
@@ -152,6 +157,13 @@ export default function SiteChecker() {
   const [globalLoading, setGlobalLoading] = useState(false);
   const [activeResult, setActiveResult] = useState(null);
   const [fetchedOk, setFetchedOk] = useState(false);
+  const manualTextareaRef = useRef(null);
+
+  useEffect(() => {
+    if (showManual && manualTextareaRef.current) {
+      manualTextareaRef.current.focus();
+    }
+  }, [showManual]);
 
   const toggleCheck = (id) => {
     setSelectedChecks((prev) =>
@@ -176,7 +188,11 @@ export default function SiteChecker() {
         text = await fetchSiteContent(url);
         setFetchedOk(true);
       } catch (e) {
-        setFetchError("auto_fail");
+        const s = e.status;
+        if (s === 504) setFetchError("timeout");
+        else if (s === 502) setFetchError("blocked");
+        else if (s === 415) setFetchError("not_html");
+        else setFetchError("fail");
         setGlobalLoading(false);
         setShowManual(true);
         return;
@@ -277,19 +293,18 @@ export default function SiteChecker() {
               onFocus={(e) => e.target.style.borderColor = "#7FFFD4"}
               onBlur={(e) => e.target.style.borderColor = "#2a2a3e"}
             />
-            {fetchError === "auto_fail" && (
+            {fetchError && (
               <div style={{
                 marginTop: 10, padding: "10px 12px",
                 background: "#1a1010", border: "1px solid #FF6B6B44",
                 borderRadius: 8, fontSize: 12, color: "#FF9999", lineHeight: 1.6,
               }}>
-                Сайт не удалось загрузить автоматически.<br/>
-                <span
-                  style={{ color: "#7FFFD4", cursor: "pointer", textDecoration: "underline" }}
-                  onClick={() => setShowManual(true)}
-                >
-                  Вставьте текст вручную →
-                </span>
+                {{
+                  timeout:  "Сайт не отвечает с наших серверов. Скопируйте текст страницы вручную и вставьте ниже.",
+                  blocked:  "Сайт блокирует автоматические запросы. Скопируйте текст страницы вручную и вставьте ниже.",
+                  not_html: "Это не HTML-страница (PDF, изображение и т.д.).",
+                  fail:     "Не удалось загрузить сайт. Попробуйте вставить текст вручную.",
+                }[fetchError] ?? "Не удалось загрузить сайт. Попробуйте вставить текст вручную."}
               </div>
             )}
             {fetchedOk && (
@@ -310,6 +325,7 @@ export default function SiteChecker() {
                 >✕</span>
               </div>
               <textarea
+                ref={manualTextareaRef}
                 value={manualText}
                 onChange={(e) => setManualText(e.target.value)}
                 placeholder="Скопируйте и вставьте сюда текст страницы сайта..."

@@ -1,0 +1,23 @@
+<svg width="200" height="200" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Маскот генератора политики конфиденциальности: фиолетовое существо с пером пишет документ">
+  <!-- Тело -->
+  <circle cx="50" cy="48" r="30" fill="#7C5CE0"/>
+  <!-- Глаз (фамильный признак) -->
+  <ellipse cx="50" cy="44" rx="17" ry="14" fill="#FFFFFF"/>
+  <!-- Полуприкрытое веко — сосредоточенно пишет -->
+  <path d="M33 40 A17 14 0 0 1 67 40 L67 37 A17 14 0 0 0 33 37 Z" fill="#5F41C4"/>
+  <!-- Зрачок с бликом -->
+  <circle cx="50" cy="47" r="7" fill="#16233B"/>
+  <circle cx="52.5" cy="44.5" r="2.2" fill="#FFFFFF"/>
+  <!-- Улыбка -->
+  <path d="M44 64 Q50 68 56 64" stroke="#FFFFFF" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <!-- Румянец -->
+  <circle cx="32" cy="54" r="3.5" fill="#B9A5F2" opacity="0.8"/>
+  <circle cx="68" cy="54" r="3.5" fill="#B9A5F2" opacity="0.8"/>
+  <!-- Перо (класс m-quill — для анимации покачивания при письме) -->
+  <g class="m-quill">
+    <path d="M84 44 Q90 56 80 74 L77 72 Q84 58 80 47 Z" fill="#F3C969"/>
+    <line x1="79" y1="73" x2="76" y2="80" stroke="#16233B" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+  <!-- Пунктирная строка — «пишет» (класс m-line — для анимации появления) -->
+  <path class="m-line" d="M40 84 Q58 78 74 82" stroke="#B9A5F2" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-dasharray="1 6"/>
+</svg>

@@ -147,6 +147,20 @@ async function runCheck(checkId, siteText) {
   return data.choices?.[0]?.message?.content || "Не удалось получить результат";
 }
 
+function getChildText(children) {
+  return [children].flat().map((c) => (typeof c === "string" ? c : "")).join("");
+}
+
+const markdownComponents = {
+  p({ children }) {
+    const text = getChildText(children);
+    if (text.startsWith("Цитата:")) return <p className="label-quote">{children}</p>;
+    if (text.startsWith("Статья закона:")) return <p className="label-law">{children}</p>;
+    if (text.startsWith("Рекомендация:")) return <p className="label-rec">{children}</p>;
+    return <p>{children}</p>;
+  },
+};
+
 export default function SiteChecker() {
   const [url, setUrl] = useState("");
   const [manualText, setManualText] = useState("");
@@ -397,7 +411,7 @@ export default function SiteChecker() {
                     }}>
                       {isSelected && "✓"}
                     </div>
-                    <span style={{ fontSize: 13, color: isSelected ? "#f0f0e8" : "#888" }}>
+                    <span style={{ fontSize: 15, color: isSelected ? "#f0f0e8" : "#888" }}>
                       {check.icon} {check.label}
                     </span>
                     {isLoading && (
@@ -543,7 +557,7 @@ export default function SiteChecker() {
                     </span>
                   </div>
                   <div className="markdown-result">
-                    <ReactMarkdown>{results[activeResult]}</ReactMarkdown>
+                    <ReactMarkdown components={markdownComponents}>{results[activeResult]}</ReactMarkdown>
                   </div>
                 </div>
               )}

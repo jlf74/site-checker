@@ -25,14 +25,36 @@ code {
   margin-bottom: 12px;
 }
 
-.markdown-result ul,
-.markdown-result ol {
+.markdown-result ul {
   padding-left: 20px;
   margin-bottom: 12px;
 }
 
-.markdown-result li {
+.markdown-result ul li {
   margin-bottom: 6px;
+}
+
+/* Нумерованные пункты — карточки */
+.markdown-result ol {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.markdown-result ol > li {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin-bottom: 12px;
+}
+
+.markdown-result ol > li > p:first-child,
+.markdown-result ol > li > p:first-child strong {
+  font-weight: 600;
+  font-size: 15px;
+  color: #e2e8f0;
+  margin-bottom: 10px;
 }
 
 .markdown-result strong {
@@ -56,4 +78,18 @@ code {
   padding: 2px 6px;
   border-radius: 4px;
   font-size: 13px;
+}
+
+/* Цветные метки в результатах */
+.label-quote {
+  font-style: italic;
+  color: #94a3b8;
+}
+
+.label-law {
+  color: #fbbf24;
+}
+
+.label-rec {
+  color: #34d399;
 }

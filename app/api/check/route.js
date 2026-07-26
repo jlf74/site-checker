@@ -2,6 +2,7 @@
 // Без ключа ANTHROPIC_API_KEY работает в mock-режиме, чтобы интерфейс можно было тестировать.
 
 import { getCheck } from '../../../lib/checks';
+import { getPrompt } from '../../../lib/prompts.server';
 
 const MODEL = process.env.CLAUDE_MODEL || 'claude-sonnet-4-6';
 
@@ -133,7 +134,8 @@ export async function POST(request) {
 
   const { checkId, siteText } = body || {};
   const check = getCheck(checkId);
-  if (!check) {
+  const prompt = getPrompt(checkId);
+  if (!check || !prompt) {
     return Response.json({ error: 'Неизвестная проверка' }, { status: 400 });
   }
   if (!siteText || typeof siteText !== 'string' || siteText.trim().length < 100) {
@@ -161,7 +163,7 @@ export async function POST(request) {
       body: JSON.stringify({
         model: MODEL,
         max_tokens: 4000,
-        system: check.prompt,
+        system: prompt,
         messages: [
           {
             role: 'user',

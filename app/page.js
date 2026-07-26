@@ -103,7 +103,7 @@ function buildTechFindings(tech) {
   return findings;
 }
 
-function EmailBoost() {
+function EmailBoost({ onDone }) {
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState('');
   const [agree, setAgree] = useState(false);
@@ -124,6 +124,7 @@ function EmailBoost() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Не получилось, попробуйте ещё раз');
       setState('done');
+      onDone?.();
     } catch (e) {
       setState('error');
       setError(e.message);
@@ -200,10 +201,20 @@ export default function Home() {
   const [checkedUrl, setCheckedUrl] = useState('');
   const [expanded, setExpanded] = useState({});
   const [devFull, setDevFull] = useState(false);
+  const [quota, setQuota] = useState(null); // { limit, remaining, boosted }
+  const [limitMsg, setLimitMsg] = useState('');
   const resultsRef = useRef(null);
   const manualRef = useRef(null);
 
   const devUnlockAvailable = process.env.NEXT_PUBLIC_DEV_UNLOCK === '1';
+
+  const refreshQuota = () =>
+    fetch('/api/quota')
+      .then((r) => r.json())
+      .then((d) => { setQuota(d); if (d.remaining > 0) setLimitMsg(''); })
+      .catch(() => {});
+
+  useEffect(() => { refreshQuota(); }, []);
 
   useEffect(() => {
     if (showManual && manualRef.current) manualRef.current.focus();
@@ -223,7 +234,17 @@ export default function Home() {
 
   async function handleRun() {
     if (!canRun) return;
+    // Ранняя проверка остатка, чтобы не гонять человека через загрузку сайта впустую.
+    if (quota && quota.remaining <= 0) {
+      setLimitMsg(
+        quota.boosted
+          ? 'На сегодня проверки закончились — вернитесь завтра или откройте полный отчёт.'
+          : 'Бесплатная проверка на сегодня использована. Оставьте почту — станет три в день.'
+      );
+      return;
+    }
     setFetchError('');
+    setLimitMsg('');
     setResults({});
     setExpanded({});
     setPhase('running');
@@ -258,6 +279,28 @@ export default function Home() {
       }
     }
 
+    // Лимит списываем только когда текст уже есть: если сайт не открылся,
+    // бесплатная проверка не должна сгорать.
+    let runToken;
+    try {
+      const res = await fetch('/api/quota', { method: 'POST' });
+      const data = await res.json();
+      if (!res.ok) {
+        setQuota({ limit: data.limit, remaining: 0, boosted: data.boosted });
+        setLimitMsg(data.error);
+        setPhase('idle');
+        setProgress({});
+        return;
+      }
+      runToken = data.runToken;
+      setQuota({ limit: data.limit, remaining: data.remaining, boosted: data.boosted });
+    } catch {
+      setFetchError('Сервис недоступен, попробуйте через минуту.');
+      setPhase('idle');
+      setProgress({});
+      return;
+    }
+
     const nextProgress = { fetch: 'done' };
     if (techResult) {
       nextProgress.tech = 'done';
@@ -272,7 +315,7 @@ export default function Home() {
           const res = await fetch('/api/check', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ checkId: id, siteText: text }),
+            body: JSON.stringify({ checkId: id, siteText: text, runToken }),
           });
           const data = await res.json();
           if (!res.ok) throw new Error(data.error);
@@ -345,6 +388,16 @@ export default function Home() {
             </div>
           )}
 
+          {limitMsg && (
+            <>
+              <div className="error-box" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <Mascot mood="alert" size={44} />
+                <span>{limitMsg}</span>
+              </div>
+              {!quota?.boosted && <EmailBoost onDone={refreshQuota} />}
+            </>
+          )}
+
           {showManual && (
             <div className="manual-block">
               <textarea
@@ -375,6 +428,14 @@ export default function Home() {
           </div>
           <p className="hint">
             Бесплатно: оценка сайта и главная проблема с решением. Без регистрации.
+            {quota && quota.remaining > 0 && (
+              <>
+                {' · '}
+                {quota.remaining === quota.limit
+                  ? `${quota.limit} ${plural(quota.limit, 'проверка', 'проверки', 'проверок')} в день`
+                  : `осталось ${quota.remaining} из ${quota.limit} на сегодня`}
+              </>
+            )}
             {!showManual && (
               <>
                 {' · '}
@@ -505,7 +566,7 @@ export default function Home() {
                   <Finding key={`ok-${i}`} finding={f} expanded={false} onToggle={undefined} locked={false} />
                 ))}
 
-                <EmailBoost />
+                <EmailBoost onDone={refreshQuota} />
               </>
             )}
 

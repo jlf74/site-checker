@@ -3,6 +3,7 @@
 
 import { getCheck } from '../../../lib/checks';
 import { getPrompt } from '../../../lib/prompts.server';
+import { verifyRunToken } from '../../../lib/quota.server';
 
 const MODEL = process.env.CLAUDE_MODEL || 'claude-sonnet-4-6';
 
@@ -132,7 +133,13 @@ export async function POST(request) {
     return Response.json({ error: 'Invalid JSON body' }, { status: 400 });
   }
 
-  const { checkId, siteText } = body || {};
+  const { checkId, siteText, runToken } = body || {};
+
+  // Токен выдаёт /api/quota, списав проверку с дневного лимита.
+  if (!verifyRunToken(runToken)) {
+    return Response.json({ error: 'Проверка устарела — запустите её заново' }, { status: 403 });
+  }
+
   const check = getCheck(checkId);
   const prompt = getPrompt(checkId);
   if (!check || !prompt) {

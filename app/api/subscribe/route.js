@@ -1,9 +1,10 @@
 // Регистрация по email для увеличения лимита бесплатных проверок.
-// MVP: пишем в локальный файл data/emails.txt; на этапе 2 заменяется на Supabase
-// с подтверждением кодом и реальным учётом лимитов.
+// MVP: пишем в локальный файл data/emails.txt; на этапе 2 заменяется на
+// PostgreSQL с подтверждением адреса кодом.
 
 import { appendFile, mkdir } from 'fs/promises';
 import path from 'path';
+import { signedCookie, BOOST_COOKIE, BOOSTED_LIMIT } from '../../../lib/quota.server';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
@@ -34,10 +35,8 @@ export async function POST(request) {
     console.error('[subscribe] write failed:', e.message);
   }
 
-  const res = Response.json({ ok: true });
-  res.headers.set(
-    'Set-Cookie',
-    `checkup_boost=1; Path=/; Max-Age=${60 * 60 * 24 * 365}; SameSite=Lax`
-  );
+  // Кука подписана и HttpOnly — расширенный лимит нельзя выставить себе из DevTools.
+  const res = Response.json({ ok: true, limit: BOOSTED_LIMIT });
+  res.headers.set('Set-Cookie', signedCookie(BOOST_COOKIE, '1', 60 * 60 * 24 * 365));
   return res;
 }

@@ -341,9 +341,19 @@ export default function Home() {
   const warningCount = allFindings.filter((f) => f.severity === 'warning').length;
   const score = computeScore(allFindings);
   const risk = computeRisk(allFindings);
-  const verdict = verdictForScore(score, criticalCount);
   const isMock = Object.values(results).some((r) => r.mock);
-  const failedCount = Object.values(results).filter((r) => r.failed).length;
+  // Упавшая проверка не должна выглядеть как «здесь всё чисто»: находок нет,
+  // а значит computeScore ничего не вычтет и оценка окажется завышенной.
+  // Поэтому называем сломавшиеся проверки прямо и предупреждаем про оценку.
+  const failedChecks = Object.entries(results)
+    .filter(([, r]) => r.failed)
+    .map(([id]) => CHECKS.find((c) => c.id === id)?.fullLabel || id);
+  const failedCount = failedChecks.length;
+  // При упавшей проверке нельзя обещать, что всё хорошо: мы просто не смотрели.
+  const verdict =
+    failedCount > 0 && criticalCount === 0
+      ? 'Проверка выполнена не полностью — выводы предварительные'
+      : verdictForScore(score, criticalCount);
 
   const scrollToPaywall = () =>
     document.querySelector('.paywall')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -512,6 +522,15 @@ export default function Home() {
             {isMock && (
               <div className="error-box" style={{ maxWidth: 'none', margin: '0 0 14px' }}>
                 Демо-режим: ключ Claude API не настроен, показаны примерные данные.
+              </div>
+            )}
+
+            {failedCount > 0 && (
+              <div className="error-box" style={{ maxWidth: 'none', margin: '0 0 14px' }}>
+                Не удалось выполнить {failedCount === 1 ? 'проверку' : 'проверки'}:{' '}
+                <b>{failedChecks.join(', ')}</b>. Оценка и список находок неполные — по{' '}
+                {failedCount === 1 ? 'этому направлению' : 'этим направлениям'} мы ничего не
+                проверили. Запустите проверку ещё раз.
               </div>
             )}
 

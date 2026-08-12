@@ -169,7 +169,10 @@ export async function POST(request) {
       },
       body: JSON.stringify({
         model: MODEL,
-        max_tokens: 4000,
+        // Потолок общий на размышления модели и на текст ответа. Sonnet 5 и
+        // Opus 5 думают по умолчанию (~3000 токенов), и при max_tokens: 4000
+        // на JSON оставалось меньше трети — он обрывался и не парсился.
+        max_tokens: 16000,
         system: prompt,
         messages: [
           {

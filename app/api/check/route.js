@@ -5,7 +5,13 @@ import { getCheck } from '../../../lib/checks';
 import { getPrompt } from '../../../lib/prompts.server';
 import { verifyRunToken } from '../../../lib/quota.server';
 
-const MODEL = process.env.CLAUDE_MODEL || 'claude-sonnet-4-6';
+const MODEL = process.env.CLAUDE_MODEL || 'claude-sonnet-5';
+
+// Глубина размышлений модели: low | medium | high | xhigh | max.
+// На размышления уходит 60-75% выходных токенов, а это основная статья расхода:
+// при high одна проверка стоит ~12 ₽ на Opus, при low — заметно дешевле.
+// Задача у нас на извлечение по жёсткой схеме, а не на свободное рассуждение.
+const EFFORT = process.env.CHECK_EFFORT || 'low';
 
 const MOCK_SUMMARY =
   'Это демонстрационный результат: ключ Claude API не настроен. Добавьте ANTHROPIC_API_KEY в .env.local.';
@@ -109,6 +115,19 @@ function parseModelJson(text) {
   return JSON.parse(s.slice(start, end + 1));
 }
 
+// Поле со штрафом показывается в отчёте как есть, поэтому обрубок вида
+// «...60 000–100 000 ₽ (ч. 1 ст.» недопустим. Промпт просит короткую верхнюю
+// границу, но модель иногда пишет развёрнуто — приводим к «до N ₽» сами.
+function shortFine(value) {
+  if (!value) return null;
+  const s = String(value).trim();
+  if (s.length <= 24) return s;
+  // Берём наибольшую сумму из строки и показываем её как верхнюю границу.
+  const amounts = s.match(/\d[\d\s   ]*\d|\d/g) || [];
+  const max = Math.max(...amounts.map((a) => Number(a.replace(/[^\d]/g, '')) || 0), 0);
+  return max > 0 ? `до ${max.toLocaleString('ru-RU')} ₽` : null;
+}
+
 function normalizeFindings(raw) {
   if (!Array.isArray(raw)) return [];
   return raw
@@ -118,7 +137,7 @@ function normalizeFindings(raw) {
       title: String(f.title).slice(0, 200),
       quote: f.quote ? String(f.quote).slice(0, 500) : null,
       law: f.law ? String(f.law).slice(0, 100) : null,
-      fine: f.fine ? String(f.fine).slice(0, 60) : null,
+      fine: shortFine(f.fine),
       fineMax: Number.isFinite(f.fineMax) && f.fineMax > 0 ? Math.min(f.fineMax, 20000000) : null,
       fix: f.fix ? String(f.fix).slice(0, 1000) : null,
     }))
@@ -173,6 +192,7 @@ export async function POST(request) {
         // Opus 5 думают по умолчанию (~3000 токенов), и при max_tokens: 4000
         // на JSON оставалось меньше трети — он обрывался и не парсился.
         max_tokens: 16000,
+        output_config: { effort: EFFORT },
         system: prompt,
         messages: [
           {

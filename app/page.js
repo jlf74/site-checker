@@ -189,6 +189,13 @@ function EmailBoost({ onDone }) {
   );
 }
 
+// Результат бесплатной проверки живёт ТОЛЬКО в браузере: час, потом стирается сам.
+// На сервер не пишем ничего — хранить чужие отчёты мы не хотим (docs/SPEC.md).
+// Это не обход лимита: счётчик серверный, здесь только показ уже полученного результата.
+// Cookie для этого не годится — в неё влезает 4 КБ, а отчёт весит 15-30 КБ.
+const CACHE_KEY = 'checkup:last-result';
+const CACHE_TTL_MS = 60 * 60 * 1000;
+
 export default function Home() {
   const [url, setUrl] = useState('');
   const [manualText, setManualText] = useState('');
@@ -205,6 +212,9 @@ export default function Home() {
   const [limitMsg, setLimitMsg] = useState('');
   const resultsRef = useRef(null);
   const manualRef = useRef(null);
+  // Момент первого сохранения. При восстановлении переносим его как есть, иначе
+  // каждое открытие страницы продлевало бы час заново и результат жил бы вечно.
+  const savedAtRef = useRef(null);
 
   const devUnlockAvailable = process.env.NEXT_PUBLIC_DEV_UNLOCK === '1';
 
@@ -215,6 +225,35 @@ export default function Home() {
       .catch(() => {});
 
   useEffect(() => { refreshQuota(); }, []);
+
+  // Восстанавливаем прошлый результат, если ему меньше часа.
+  useEffect(() => {
+    let saved;
+    try {
+      saved = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
+    } catch {
+      saved = null;
+    }
+    if (!saved || !saved.results || Date.now() - saved.savedAt > CACHE_TTL_MS) {
+      try { localStorage.removeItem(CACHE_KEY); } catch {}
+      return;
+    }
+    savedAtRef.current = saved.savedAt;
+    setResults(saved.results);
+    setCheckedUrl(saved.checkedUrl || '');
+    setPhase('done');
+  }, []);
+
+  // Сохраняем готовый результат. Демо-заглушки не сохраняем: они не настоящие.
+  useEffect(() => {
+    if (phase !== 'done' || Object.keys(results).length === 0) return;
+    if (Object.values(results).some((r) => r.mock)) return;
+    const savedAt = savedAtRef.current || Date.now();
+    savedAtRef.current = savedAt;
+    try {
+      localStorage.setItem(CACHE_KEY, JSON.stringify({ savedAt, checkedUrl, results }));
+    } catch {}
+  }, [phase, results, checkedUrl]);
 
   useEffect(() => {
     if (showManual && manualRef.current) manualRef.current.focus();
@@ -247,6 +286,7 @@ export default function Home() {
     setLimitMsg('');
     setResults({});
     setExpanded({});
+    savedAtRef.current = null; // новая проверка — новый час хранения
     setPhase('running');
     setProgress({ fetch: 'active' });
 
@@ -566,7 +606,7 @@ export default function Home() {
                       <div className="paywall-features">
                         <div><Icon name="check" size={13} style={{ color: 'var(--c-primary-dark)', position: 'relative', top: 3 }} />Каждая находка: цитата, риск и готовое исправление</div>
                         <div><Icon name="check" size={13} style={{ color: 'var(--c-primary-dark)', position: 'relative', top: 3 }} />Постоянная ссылка — можно отправить подрядчику</div>
-                        <div><Icon name="check" size={13} style={{ color: 'var(--c-primary-dark)', position: 'relative', top: 3 }} />Бесплатная перепроверка после исправлений</div>
+                        <div><Icon name="check" size={13} style={{ color: 'var(--c-primary-dark)', position: 'relative', top: 3 }} />Бесплатная перепроверка после исправлений — месяц</div>
                       </div>
                     </div>
                     <div className="paywall-cta">
@@ -630,7 +670,7 @@ export default function Home() {
             </div>
             <div className="step">
               <b>Полный отчёт — 990 ₽</b>
-              <p style={{ margin: '8px 0 0' }}>Все находки с цитатами и исправлениями, постоянная ссылка, PDF и бесплатная перепроверка после правок.</p>
+              <p style={{ margin: '8px 0 0' }}>Все находки с цитатами и исправлениями, ссылка на отчёт, PDF и бесплатная перепроверка — месяц.</p>
             </div>
           </div>
         </section>

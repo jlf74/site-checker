@@ -4,6 +4,7 @@ export default function Footer() {
     <footer className="footer">
       <div className="footer-links">
         <a href="/privacy">Политика конфиденциальности</a>
+        <a href="/offer">Публичная оферта</a>
         {showPolicyGen && <a href="/policy-generator">Генератор политики</a>}
         <a href="mailto:hello@sait-checkup.ru">hello@sait-checkup.ru</a>
       </div>

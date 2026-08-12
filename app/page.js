@@ -605,7 +605,7 @@ export default function Home() {
                       </div>
                       <div className="paywall-features">
                         <div><Icon name="check" size={13} style={{ color: 'var(--c-primary-dark)', position: 'relative', top: 3 }} />Каждая находка: цитата, риск и готовое исправление</div>
-                        <div><Icon name="check" size={13} style={{ color: 'var(--c-primary-dark)', position: 'relative', top: 3 }} />Постоянная ссылка — можно отправить подрядчику</div>
+                        <div><Icon name="check" size={13} style={{ color: 'var(--c-primary-dark)', position: 'relative', top: 3 }} />Ссылка на отчёт — можно отправить подрядчику</div>
                         <div><Icon name="check" size={13} style={{ color: 'var(--c-primary-dark)', position: 'relative', top: 3 }} />Бесплатная перепроверка после исправлений — месяц</div>
                       </div>
                     </div>
@@ -616,7 +616,11 @@ export default function Home() {
                       >
                         {risk > 0 ? `Убрать риски — 990 ₽` : 'Открыть отчёт — 990 ₽'}
                       </button>
-                      <div className="paywall-note">Подробный отчёт в PDF-формате сразу после оплаты</div>
+                      <div className="paywall-note">
+                        Подробный отчёт в PDF-формате сразу после оплаты.{' '}
+                        Нажимая кнопку, вы принимаете условия{' '}
+                        <a href="/offer" target="_blank" rel="noopener noreferrer">публичной оферты</a>.
+                      </div>
                     </div>
                   </div>
                 )}

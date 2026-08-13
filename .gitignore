@@ -18,3 +18,7 @@ data/
 .claude/settings.local.json
 .claude/worktrees/
 
+
+# сырые прогоны моделей — разбор чужих сайтов, публиковать нельзя
+benchmarks/*
+!benchmarks/README.md

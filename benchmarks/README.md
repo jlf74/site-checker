@@ -10,3 +10,31 @@
 Выводы и решения по итогам прогонов — в docs/SPEC.md.
 
 Файлы не удалять: перегонять заново стоит денег и времени.
+
+## Как прогнать
+
+```
+node benchmarks/run.mjs --model=claude-opus-5 --url=https://example.com/page
+node benchmarks/run.mjs --model=yandexgpt --url=https://example.com/page
+NODE_EXTRA_CA_CERTS="D:/AI Проекты/site-checker/benchmarks/russian_trusted_ca.pem" \
+  node benchmarks/run.mjs --model=GigaChat-3-Ultra --url=https://example.com/page
+```
+
+GigaChat требует российский корневой сертификат — отсюда `NODE_EXTRA_CA_CERTS`.
+Сертификат лежит файлом в этой папке и подключается только к той команде, где указан;
+в системное хранилище Windows он не ставится. Отключать проверку сертификатов нельзя.
+
+Ключи: `--effort=low|medium|high` (только Claude, по умолчанию `low`),
+`--refetch` — перекачать страницу заново.
+
+- `pages/` — текст страницы, скачанный один раз. Все модели получают
+  один и тот же вход, иначе сравнение нечестное. Без `--refetch` берётся кэш.
+- `runs/` — результаты прогонов: находки, время, токены, стоимость.
+
+Прогон использует боевые промпты (`lib/prompts.server.js`), боевой разбор
+ответа (`lib/findings.server.js`) и боевую загрузку страницы
+(`app/api/proxy/route.js`) — цифры сравнимы с тем, что увидит покупатель.
+
+⚠️ Стоимость Claude считается по прайсу Anthropic и курсу `RUB_PER_USD`
+(по умолчанию 95). Цена YandexGPT в `run.mjs` внесена по памяти и **не
+проверена** — документация Яндекса отдаёт капчу и автоматически не читается.

@@ -25,6 +25,11 @@ const DESCRIPTION =
   'Проверка сайта на соответствие 152-ФЗ, законам о рекламе и об образовании. Плюс орфография, SEO и тексты. Бесплатно, за 3 минуты.';
 
 export const metadata = {
+  // От этого адреса строится ссылка на og-картинку. Без него Next подставит
+  // тот хост, с которого пришёл запрос, и в теге может оказаться localhost —
+  // тогда Telegram картинку не заберёт. Домен можно переопределить переменной
+  // NEXT_PUBLIC_SITE_URL, пока сайт живёт на техническом адресе Timeweb.
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://sait-checkup.ru'),
   title: TITLE,
   description: DESCRIPTION,
   // Без этого блока ссылка на сайт в Telegram и мессенджерах разворачивается пустой

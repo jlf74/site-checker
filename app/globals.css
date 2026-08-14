@@ -691,9 +691,17 @@ input, textarea {
   white-space: nowrap;
 }
 
+.finding-numbers {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1.15;
+}
+
 .finding-fine {
-  font-size: 12.5px;
-  font-weight: 500;
+  font-family: var(--font-onest), 'Onest', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
   color: var(--c-danger);
   white-space: nowrap;
 }
@@ -713,15 +721,26 @@ input, textarea {
   font-size: 14px;
 }
 
+/* Суммарный риск — главный аргумент отчёта, поэтому набран как цифра,
+   а не как часть предложения. Подпись сверху, сумма крупно. */
 .risk-line {
-  margin-top: 10px;
-  font-size: 15px;
-  color: var(--c-ink);
+  margin-top: 14px;
 }
 
-.risk-line b {
-  font-family: var(--font-manrope), 'Manrope', sans-serif;
-  font-size: 18px;
+.risk-label {
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--c-faint);
+  margin-bottom: 2px;
+}
+
+.risk-sum {
+  font-family: var(--font-onest), 'Onest', sans-serif;
+  font-size: 34px;
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
   color: var(--c-danger);
 }
 

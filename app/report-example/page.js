@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Finding from '../../components/Finding';
+import RiskLine from '../../components/RiskLine';
 import { EXAMPLE_REPORT as EXAMPLE } from '../../lib/example-report';
 
 
@@ -39,9 +40,7 @@ export default function ReportExamplePage() {
               <span className="sev-chip warning">{problems.length - criticalCount} замечаний</span>
               <span className="sev-chip ok">{okItems.length} в порядке</span>
             </div>
-            <div className="risk-line">
-              Суммарный риск штрафов: <b>до {EXAMPLE.risk.toLocaleString('ru-RU')} ₽</b>
-            </div>
+            <RiskLine risk={EXAMPLE.risk} />
           </div>
         </div>
 

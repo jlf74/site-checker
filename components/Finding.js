@@ -10,8 +10,14 @@ export default function Finding({ finding, expanded, onToggle, locked }) {
         <span className={`sev-badge ${finding.severity}`}>{SEV_LABEL[finding.severity]}</span>
         <span className="finding-title">{finding.title}</span>
         <span className="finding-meta">
-          {finding.fine && <span className="finding-fine">{finding.fine}</span>}
-          {finding.law && <span className="finding-law">{finding.law}</span>}
+          {/* Штраф и статья стоят колонкой: сумма — крупно, статья под ней мелко.
+              Цена вопроса должна считываться без чтения заголовка. */}
+          {(finding.fine || finding.law) && (
+            <span className="finding-numbers">
+              {finding.fine && <span className="finding-fine">{finding.fine}</span>}
+              {finding.law && <span className="finding-law">{finding.law}</span>}
+            </span>
+          )}
           {locked ? (
             <Icon name="lock" size={16} style={{ color: 'var(--c-faint)' }} />
           ) : hasBody ? (

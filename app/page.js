@@ -6,6 +6,7 @@ import { EXAMPLE_REPORT } from '../lib/example-report';
 import Icon from '../components/Icon';
 import Finding from '../components/Finding';
 import Mascot from '../components/Mascot';
+import RiskLine from '../components/RiskLine';
 
 const SEV_ORDER = { critical: 0, warning: 1, ok: 2 };
 
@@ -550,11 +551,7 @@ export default function Home() {
                   {warningCount > 0 && <span className="sev-chip warning">{warningCount} замечаний</span>}
                   {okItems.length > 0 && <span className="sev-chip ok">{okItems.length} в порядке</span>}
                 </div>
-                {risk > 0 && (
-                  <div className="risk-line">
-                    Суммарный риск штрафов: <b>до {risk.toLocaleString('ru-RU')} ₽</b>
-                  </div>
-                )}
+                <RiskLine risk={risk} />
               </div>
               <span className="verdict-mascot">
                 <Mascot mood={criticalCount > 0 ? 'alert' : 'happy'} size={72} />
@@ -681,9 +678,7 @@ export default function Home() {
               <div>
                 <div className="verdict-title">{EXAMPLE_REPORT.verdict}</div>
                 <div className="verdict-sub">{EXAMPLE_REPORT.url} · пример отчёта</div>
-                <div className="risk-line">
-                  Суммарный риск штрафов: <b>до {EXAMPLE_REPORT.risk.toLocaleString('ru-RU')} ₽</b>
-                </div>
+                <RiskLine risk={EXAMPLE_REPORT.risk} />
               </div>
             </div>
 

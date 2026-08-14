@@ -213,6 +213,7 @@ export default function Home() {
   const [quota, setQuota] = useState(null); // { limit, remaining, boosted }
   const [limitMsg, setLimitMsg] = useState('');
   const [payNotice, setPayNotice] = useState(false); // оплата ещё не подключена — см. ROADMAP, этап 2
+  const [urlFocused, setUrlFocused] = useState(false); // маскот улыбается шире, пока курсор в поле адреса
   const resultsRef = useRef(null);
   const manualRef = useRef(null);
   // Момент первого сохранения. При восстановлении переносим его как есть, иначе
@@ -406,7 +407,7 @@ export default function Home() {
         <section className="hero">
           {phase !== 'running' && (
             <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 10 }}>
-              <Mascot mood="idle" size={76} />
+              <Mascot mood={urlFocused ? 'ready' : 'idle'} size={76} />
             </div>
           )}
           <span className="hero-badge">
@@ -426,6 +427,8 @@ export default function Home() {
               value={url}
               onChange={(e) => { setUrl(e.target.value); setFetchError(''); }}
               onKeyDown={(e) => e.key === 'Enter' && handleRun()}
+              onFocus={() => setUrlFocused(true)}
+              onBlur={() => setUrlFocused(false)}
               placeholder="https://ваш-сайт.ru"
               autoComplete="off"
             />

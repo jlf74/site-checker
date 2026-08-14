@@ -508,13 +508,24 @@ input, textarea {
   transform-origin: center;
 }
 
-.mascot-idle .m-lid {
+/* Улыбка меняется плавно, а не скачком */
+.mascot .m-smile {
+  transition: d 0.22s ease;
+}
+
+.mascot-idle .m-lid,
+.mascot-ready .m-lid {
   transform: scaleY(0);
   animation: m-blink 4.5s infinite;
 }
 
 .mascot-idle .m-pupil {
   animation: m-look 7s ease-in-out infinite;
+}
+
+/* Пока курсор в поле адреса, маскот смотрит прямо и не отвлекается */
+.mascot-ready .m-pupil {
+  animation: none;
 }
 
 .mascot-reading .m-pupil-scan {
@@ -583,6 +594,7 @@ input, textarea {
   .progress-card::after,
   .spinner {
     animation: none !important;
+    transition: none !important;
   }
 }
 

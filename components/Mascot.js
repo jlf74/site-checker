@@ -1,4 +1,5 @@
-// Маскот-глазастик. Настроения: idle (моргает, оглядывается), reading (сканирует с лупой),
+// Маскот-глазастик. Настроения: idle (моргает, оглядывается), ready (то же, но
+// улыбается шире — когда посетитель встал в поле адреса), reading (сканирует с лупой),
 // alert (нашёл проблему), happy (всё в порядке). Анимации — в globals.css, уважают reduced-motion.
 
 export default function Mascot({ mood = 'idle', size = 80, style }) {
@@ -59,7 +60,7 @@ export default function Mascot({ mood = 'idle', size = 80, style }) {
         </>
       )}
 
-      {mood === 'idle' && (
+      {(mood === 'idle' || mood === 'ready') && (
         <>
           <ellipse cx="50" cy="48" rx="19" ry="16" fill="#FFFFFF" />
           <g className="m-pupil">
@@ -67,9 +68,18 @@ export default function Mascot({ mood = 'idle', size = 80, style }) {
             <circle cx="53" cy="47" r="2.5" fill="#FFFFFF" />
           </g>
           <ellipse className="m-lid" cx="50" cy="48" rx="20" ry="17" fill="#2563EB" />
-          <path d="M42 72 Q50 77 58 72" stroke="#FFFFFF" strokeWidth="3" fill="none" strokeLinecap="round" />
-          <circle cx="30" cy="60" r="4" fill="#7FA3F2" opacity="0.7" />
-          <circle cx="70" cy="60" r="4" fill="#7FA3F2" opacity="0.7" />
+          {/* Улыбка шире, когда посетитель встал в поле адреса: маскот
+              как будто приготовился читать сайт. Плавность — в globals.css. */}
+          <path
+            className="m-smile"
+            d={mood === 'ready' ? 'M38 70 Q50 81 62 70' : 'M42 72 Q50 77 58 72'}
+            stroke="#FFFFFF"
+            strokeWidth="3"
+            fill="none"
+            strokeLinecap="round"
+          />
+          <circle cx="30" cy="60" r="4" fill="#7FA3F2" opacity={mood === 'ready' ? 0.95 : 0.7} />
+          <circle cx="70" cy="60" r="4" fill="#7FA3F2" opacity={mood === 'ready' ? 0.95 : 0.7} />
         </>
       )}
     </svg>

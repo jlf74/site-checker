@@ -62,23 +62,39 @@ export default async function Image() {
           <div style={{ fontSize: 30, fontWeight: 700, color: '#16233B' }}>СайтЧекап</div>
         </div>
 
-        {/* Заголовок и подпись */}
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <div
-            style={{
-              fontSize: 68,
-              fontWeight: 700,
-              lineHeight: 1.16,
-              color: '#16233B',
-              letterSpacing: '-0.02em',
-              maxWidth: 940,
-            }}
-          >
-            Проверьте свой сайт раньше, чем получите штраф
+        {/* Заголовок, подпись и маскот */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 48 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+            <div
+              style={{
+                fontSize: 62,
+                fontWeight: 700,
+                // Плотная межстрочная: в заголовке из трёх строк воздух между ними
+                // не нужен, иначе блок разъезжается и превью читается хуже.
+                lineHeight: 1.04,
+                color: '#16233B',
+                letterSpacing: '-0.02em',
+              }}
+            >
+              Проверьте свой сайт раньше, чем получите штраф
+            </div>
+            {/* Строка должна умещаться в одну: иначе последнее слово повисает
+                отдельной строкой и превью выглядит неопрятно. */}
+            <div style={{ fontSize: 28, color: '#5B6B84', marginTop: 24 }}>
+              152-ФЗ · реклама · образование · орфография
+            </div>
           </div>
-          <div style={{ fontSize: 30, color: '#5B6B84', marginTop: 26 }}>
-            152-ФЗ · реклама · образование · орфография · тексты
-          </div>
+
+          {/* Маскот-глазастик — тот же, что на сайте */}
+          <svg width="250" height="250" viewBox="0 0 100 100">
+            <circle cx="50" cy="52" r="34" fill="#2563EB" />
+            <ellipse cx="50" cy="48" rx="19" ry="16" fill="#FFFFFF" />
+            <circle cx="50" cy="50" r="8" fill="#16233B" />
+            <circle cx="53" cy="47" r="2.5" fill="#FFFFFF" />
+            <path d="M42 72 Q50 77 58 72" stroke="#FFFFFF" strokeWidth="3" fill="none" strokeLinecap="round" />
+            <circle cx="30" cy="60" r="4" fill="#7FA3F2" opacity="0.7" />
+            <circle cx="70" cy="60" r="4" fill="#7FA3F2" opacity="0.7" />
+          </svg>
         </div>
 
         {/* Нижняя строка */}

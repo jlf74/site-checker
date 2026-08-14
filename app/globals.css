@@ -13,7 +13,10 @@
   /* Нейтральные */
   --c-ink: #16233b;
   --c-muted: #5b6b84;
-  --c-faint: #8595ac;
+  /* Затемнён с #8595ac до контраста WCAG AA: 5.1:1 на белом и 4.8:1 на фоне
+     карточки находки. Прежний давал 3.05 — мелкий вторичный текст (статьи законов,
+     подсказки) не проходил норму. Сервис проверяет чужие сайты, свой обязан быть чистым. */
+  --c-faint: #5f6e8a;
   --c-bg: #ffffff;
   --c-bg-soft: #f6f8fc;
   --c-border: #e4e9f2;
@@ -55,8 +58,16 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Display-шрифт: заголовки, вердикт, заголовки находок и кнопки.
+   Основной текст — Manrope (см. body). Пара выбрана на витрине /font-lab. */
+h1, h2, h3,
+.verdict-title,
+.finding-title,
+.btn {
+  font-family: var(--font-onest), 'Onest', system-ui, sans-serif;
+}
+
 h1, h2, h3 {
-  font-family: var(--font-manrope), 'Manrope', system-ui, sans-serif;
   font-weight: 700;
   line-height: 1.25;
   margin: 0;
@@ -69,6 +80,15 @@ button {
 
 input, textarea {
   font-family: inherit;
+}
+
+/* Видимый фокус при навигации с клавиатуры. Именно :focus-visible, а не :focus —
+   иначе рамка появляется и на обычный клик мышью. Раньше правил не было вовсе:
+   пройти сайт табом было можно, но не видно, где находишься. */
+:focus-visible {
+  outline: 2px solid var(--c-primary);
+  outline-offset: 2px;
+  border-radius: 4px;
 }
 
 .container {
@@ -220,6 +240,38 @@ input, textarea {
   background: none;
   border: none;
   padding: 0;
+}
+
+/* Подсказка «кабинет позже» вместо системного окна браузера */
+.login-wrap {
+  position: relative;
+}
+
+.login-note {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 30;
+  width: 232px;
+  background: var(--c-bg);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  padding: 10px 13px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--c-muted);
+  text-align: left;
+}
+
+.mobile-nav-note {
+  padding: 10px 13px;
+  margin: 10px 0 4px;
+  background: var(--c-bg-soft);
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--c-muted);
 }
 
 .btn {
@@ -719,6 +771,19 @@ input, textarea {
   text-align: center;
 }
 
+.pay-notice {
+  margin-top: 10px;
+  max-width: 220px;
+  background: var(--c-primary-soft);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-md);
+  padding: 9px 12px;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--c-muted);
+  text-align: left;
+}
+
 .paywall-note {
   font-size: 12px;
   color: var(--c-faint);
@@ -850,12 +915,12 @@ input, textarea {
 
 .footer-fineprint {
   margin-top: 16px;
-  font-size: 11px;
-  color: #a9b4c6;
+  font-size: 12px;
+  color: var(--c-faint);
 }
 
 .footer-fineprint a {
-  color: #a9b4c6;
+  color: var(--c-faint);
 }
 
 .footer-fineprint a:hover {

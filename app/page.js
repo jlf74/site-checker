@@ -210,6 +210,7 @@ export default function Home() {
   const [devFull, setDevFull] = useState(false);
   const [quota, setQuota] = useState(null); // { limit, remaining, boosted }
   const [limitMsg, setLimitMsg] = useState('');
+  const [payNotice, setPayNotice] = useState(false); // оплата ещё не подключена — см. ROADMAP, этап 2
   const resultsRef = useRef(null);
   const manualRef = useRef(null);
   // Момент первого сохранения. При восстановлении переносим его как есть, иначе
@@ -612,10 +613,17 @@ export default function Home() {
                     <div className="paywall-cta">
                       <button
                         className="btn btn-primary"
-                        onClick={() => alert('Оплата через Продамус подключается на следующем этапе разработки.')}
+                        onClick={() => setPayNotice(true)}
+                        aria-describedby={payNotice ? 'pay-notice' : undefined}
                       >
                         {risk > 0 ? `Убрать риски — 990 ₽` : 'Открыть отчёт — 990 ₽'}
                       </button>
+                      {payNotice && (
+                        <div className="pay-notice" id="pay-notice" role="status">
+                          Оплата ещё не подключена — сервис готовится к запуску.
+                          Полный отчёт откроется, как только заработает приём платежей.
+                        </div>
+                      )}
                       <div className="paywall-note">
                         Подробный отчёт в PDF-формате сразу после оплаты.{' '}
                         Нажимая кнопку, вы принимаете условия{' '}

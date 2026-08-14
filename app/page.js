@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { CHECKS, computeScore, computeRisk, verdictForScore } from '../lib/checks';
+import { EXAMPLE_REPORT } from '../lib/example-report';
 import Icon from '../components/Icon';
 import Finding from '../components/Finding';
 import Mascot from '../components/Mascot';
@@ -665,6 +666,33 @@ export default function Home() {
             <div className="step">
               <b><span className="step-num">3</span>Получите вердикт</b>
               <p>Бесплатно — оценка и главная проблема. Полный отчёт с исправлениями — 990 ₽.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* Превью отчёта. Ссылку «Пример отчёта» в шапке кликают единицы, а показать
+            товар до того, как человек ввёл адрес, — самый прямой путь к доверию.
+            Данные общие со страницей /report-example, поэтому расходиться не могут. */}
+        <section className="section" id="example">
+          <h2>Так выглядит отчёт</h2>
+          <div className="report-preview">
+            <div className="verdict-head" style={{ paddingTop: 0 }}>
+              <ScoreRing score={EXAMPLE_REPORT.score} />
+              <div>
+                <div className="verdict-title">{EXAMPLE_REPORT.verdict}</div>
+                <div className="verdict-sub">{EXAMPLE_REPORT.url} · пример отчёта</div>
+                <div className="risk-line">
+                  Суммарный риск штрафов: <b>до {EXAMPLE_REPORT.risk.toLocaleString('ru-RU')} ₽</b>
+                </div>
+              </div>
+            </div>
+
+            {EXAMPLE_REPORT.findings.slice(0, 2).map((f, i) => (
+              <Finding key={i} finding={f} expanded={i === 0} locked={false} />
+            ))}
+
+            <div className="report-preview-more">
+              <a href="/report-example">Смотреть пример целиком →</a>
             </div>
           </div>
         </section>

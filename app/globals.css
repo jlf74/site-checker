@@ -698,6 +698,21 @@ input, textarea {
   white-space: nowrap;
 }
 
+/* Превью отчёта на главной */
+.report-preview {
+  max-width: 720px;
+  margin: 0 auto;
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 20px 22px 8px;
+}
+
+.report-preview-more {
+  padding: 14px 2px 16px;
+  font-size: 14px;
+}
+
 .risk-line {
   margin-top: 10px;
   font-size: 15px;
